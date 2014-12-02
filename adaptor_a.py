@@ -27,7 +27,7 @@ class Adaptor(CbAdaptor):
         logging.basicConfig(filename=CB_LOGFILE,level=CB_LOGGING_LEVEL,format='%(asctime)s %(message)s')
         self.status =           "ok"
         self.state =            "stopped"
-        self.apps =             {"buttons": [],
+        self.apps =             {"number_buttons": [],
                                  "battery": [],
                                  "connected": []}
         self.currentValue =     "0"
@@ -82,7 +82,7 @@ class Adaptor(CbAdaptor):
         if message["content"] == "init":
             self.updateTime = 0
             self.lastUpdateTime = time.time()
-            # Buttons 
+            # number_buttons 
             for button in ('1', '2'):
                 cmd = {"id": self.id,
                        "request": "get",
@@ -120,9 +120,9 @@ class Adaptor(CbAdaptor):
                             updateTime = message["data"]["updateTime"]
                             data = {instance: onOff(self.currentValue)}
                             logging.debug("%s %s onZwaveMessage, data: %s", ModuleName, self.id, data)
-                            self.sendCharacteristic("buttons", data, time.time())
+                            self.sendCharacteristic("number_buttons", data, time.time())
                 elif message["commandClass"] == "128":
-                     logging.debug("%s %s onZwaveMessage, battery message: %s", ModuleName, self.id, str(message))
+                     #logging.debug("%s %s onZwaveMessage, battery message: %s", ModuleName, self.id, str(message))
                      battery = message["data"]["last"]["value"] 
                      logging.info("%s %s battery level: %s", ModuleName, self.id, battery)
                      msg = {"id": self.id,
@@ -133,15 +133,15 @@ class Adaptor(CbAdaptor):
                 else:
                     logging.warning("%s onZwaveMessage. Unrecognised message: %s", ModuleName, str(message))
                 self.updateTime = message["data"]["updateTime"]
-            except Exception as inst:
-                logging.warning("%s onZwaveMessage. Exception: %s %s %s", ModuleName, str(message), type(inst), str(inst.args))
+            except Exception as ex:
+                logging.warning("%s onZwaveMessage. Exception: %s %s %s", ModuleName, str(message), type(ex), str(ex.args))
 
     def onAppInit(self, message):
         logging.debug("%s %s %s onAppInit, req = %s", ModuleName, self.id, self.friendly_name, message)
         resp = {"name": self.name,
                 "id": self.id,
                 "status": "ok",
-                "service": [{"characteristic": "buttons", "interval": 0},
+                "service": [{"characteristic": "number_buttons", "interval": 0},
                             {"characteristic": "battery", "interval": 600},
                             {"characteristic": "connected", "interval": 600}],
                 "content": "service"}
@@ -172,7 +172,7 @@ class Adaptor(CbAdaptor):
             May be called again if there is a new configuration, which
             could be because a new app has been added.
         """
-        logging.debug("%s onConfigureMessage, config: %s", ModuleName, config)
+        #logging.debug("%s onConfigureMessage, config: %s", ModuleName, config)
         self.setState("starting")
 
 if __name__ == '__main__':

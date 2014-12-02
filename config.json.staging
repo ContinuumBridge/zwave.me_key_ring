@@ -2,7 +2,7 @@
     "exe": "adaptor.py", 
     "protocol": "zwave", 
     "name": "Z-Wave.Me 4 256", 
-    "url": "https://github.com/ContinuumBridge/z-wave.me-key-ring/archive/v0.0.1.tar.gz", 
+    "url": "https://github.com/ContinuumBridge/zwave.me_key_ring/archive/v0.0.1.tar.gz",
     "version": "0.0.1", 
     "provider": "ContinuumBridge", 
     "description": "Z-Wave.Me key ring with four buttons."
