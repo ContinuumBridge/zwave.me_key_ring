@@ -3,8 +3,8 @@
     "protocol": "zwave", 
     "name": "Z-Wave.Me 1 256", 
     "device_resource": "/api/bridge/v1/device/50/", 
-    "url": "https://github.com/ContinuumBridge/zwave.me_key_ring/archive/v0.1.0.tar.gz", 
-    "version": "0.1.0", 
+    "url": "https://github.com/ContinuumBridge/zwave.me_key_ring/archive/v1.0.0.tar.gz", 
+    "version": "1.0.0", 
     "provider": "ContinuumBridge", 
     "adaptor_resource": "/api/bridge/v1/adaptor/13/", 
     "description": "Z-Wave.Me Key Ring Controller with four buttons."

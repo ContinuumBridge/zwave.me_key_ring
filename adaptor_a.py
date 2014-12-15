@@ -118,8 +118,17 @@ class Adaptor(CbAdaptor):
                         if str(message["data"]["value"]) == self.addr:
                             instance = message["instance"]
                             updateTime = message["data"]["updateTime"]
-                            data = {instance: onOff(self.currentValue)}
-                            logging.debug("%s %s onZwaveMessage, data: %s", ModuleName, self.id, data)
+                            if instance == "1":
+                                if self.currentValue == 255:
+                                    data = {"1": "on"}
+                                else:
+                                    data = {"3": "on"}
+                            elif instance == "2":
+                                if self.currentValue == 255:
+                                    data = {"2": "on"}
+                                else:
+                                    data = {"4": "on"}
+                            #logging.debug("%s %s onZwaveMessage, data: %s", ModuleName, self.id, data)
                             self.sendCharacteristic("number_buttons", data, time.time())
                 elif message["commandClass"] == "128":
                      #logging.debug("%s %s onZwaveMessage, battery message: %s", ModuleName, self.id, str(message))
