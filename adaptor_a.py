@@ -75,7 +75,7 @@ class Adaptor(CbAdaptor):
         reactor.callLater(SENSOR_POLL_INTERVAL * 2, self.checkConnected)
 
     def onZwaveMessage(self, message):
-        #cbLog("debug", "onZwaveMessage, message: " + str(message))
+        #self.cbLog("debug", "onZwaveMessage, message: " + str(message))
         if message["content"] == "init":
             self.updateTime = 0
             self.lastUpdateTime = time.time()
@@ -125,24 +125,24 @@ class Adaptor(CbAdaptor):
                                     data = {"2": "on"}
                                 else:
                                     data = {"4": "on"}
-                            #cbLog("debug", "onZwaveMessage, data: " + data)
+                            #self.cbLog("debug", "onZwaveMessage, data: " + data)
                             self.sendCharacteristic("number_buttons", data, time.time())
                 elif message["commandClass"] == "128":
                      battery = message["data"]["last"]["value"] 
-                     cbLog("info", "battery level: " +  str(battery))
+                     self.cbLog("info", "battery level: " +  str(battery))
                      msg = {"id": self.id,
                             "status": "battery_level",
                             "battery_level": battery}
                      self.sendManagerMessage(msg)
                      self.sendCharacteristic("battery", battery, time.time())
                 else:
-                    cbLog("warning", "onZwaveMessage. Unrecognised message: " + str(message))
+                    self.cbLog("warning", "onZwaveMessage. Unrecognised message: " + str(message))
                 self.updateTime = message["data"]["updateTime"]
             except Exception as ex:
-                cbLog("warning", "onZwaveMessage. Exception: " + str(message) + " " + str(type(ex)) + " " + str(ex.args))
+                self.cbLog("warning", "onZwaveMessage. Exception: " + str(message) + " " + str(type(ex)) + " " + str(ex.args))
 
     def onAppInit(self, message):
-        cbLog("debug", "onAppInit, req: " +  str(message))
+        self.cbLog("debug", "onAppInit, req: " +  str(message))
         resp = {"name": self.name,
                 "id": self.id,
                 "status": "ok",
@@ -162,14 +162,13 @@ class Adaptor(CbAdaptor):
         for f in message["service"]:
             if message["id"] not in self.apps[f["characteristic"]]:
                 self.apps[f["characteristic"]].append(message["id"])
-        cbLog("debug", "apps: " + str(self.apps))
+        self.cbLog("debug", "apps: " + str(self.apps))
 
     def onAppCommand(self, message):
         if "data" not in message:
-            cbLog("warning", "app message without data: " + str(message))
+            self.cbLog("warning", "app message without data: " + str(message))
         else:
-            cbLog("warning", "This is a sensor. Message not understood: " + str(message)
-)
+            self.cbLog("warning", "This is a sensor. Message not understood: " + str(message))
     def onConfigureMessage(self, config):
         """Config is based on what apps are to be connected.
             May be called again if there is a new configuration, which
