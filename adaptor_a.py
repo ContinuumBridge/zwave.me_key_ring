@@ -10,7 +10,6 @@ import sys
 import time
 import os
 from pprint import pprint
-import logging
 from cbcommslib import CbAdaptor
 from cbconfig import *
 from twisted.internet import threads
@@ -24,7 +23,6 @@ def onOff(value):
 
 class Adaptor(CbAdaptor):
     def __init__(self, argv):
-        logging.basicConfig(filename=CB_LOGFILE,level=CB_LOGGING_LEVEL,format='%(asctime)s %(message)s')
         self.status =           "ok"
         self.state =            "stopped"
         self.apps =             {"number_buttons": [],
@@ -41,7 +39,6 @@ class Adaptor(CbAdaptor):
             self.state == "error"
         elif action == "clear_error":
             self.state = "running"
-        logging.debug("%s %s state = %s", ModuleName, self.id, self.state)
         msg = {"id": self.id,
                "status": "state",
                "state": self.state}
@@ -78,7 +75,7 @@ class Adaptor(CbAdaptor):
         reactor.callLater(SENSOR_POLL_INTERVAL * 2, self.checkConnected)
 
     def onZwaveMessage(self, message):
-        #logging.debug("%s %s onZwaveMessage, message: %s", ModuleName, self.id, str(message))
+        #cbLog("debug", "onZwaveMessage, message: " + str(message))
         if message["content"] == "init":
             self.updateTime = 0
             self.lastUpdateTime = time.time()
@@ -112,9 +109,9 @@ class Adaptor(CbAdaptor):
         elif message["content"] == "data":
             try:
                 if message["commandClass"] == "32":
-                    if message["data"]["name"] == "level":
+                    if message["value"] == "level":
                         self.currentValue = message["data"]["value"]
-                    elif message["data"]["name"] == "srcNodeId":
+                    elif message["value"] == "srcNodeId":
                         if str(message["data"]["value"]) == self.addr:
                             instance = message["instance"]
                             updateTime = message["data"]["updateTime"]
@@ -128,25 +125,24 @@ class Adaptor(CbAdaptor):
                                     data = {"2": "on"}
                                 else:
                                     data = {"4": "on"}
-                            #logging.debug("%s %s onZwaveMessage, data: %s", ModuleName, self.id, data)
+                            #cbLog("debug", "onZwaveMessage, data: " + data)
                             self.sendCharacteristic("number_buttons", data, time.time())
                 elif message["commandClass"] == "128":
-                     #logging.debug("%s %s onZwaveMessage, battery message: %s", ModuleName, self.id, str(message))
                      battery = message["data"]["last"]["value"] 
-                     logging.info("%s %s battery level: %s", ModuleName, self.id, battery)
+                     cbLog("info", "battery level: " +  str(battery))
                      msg = {"id": self.id,
                             "status": "battery_level",
                             "battery_level": battery}
                      self.sendManagerMessage(msg)
                      self.sendCharacteristic("battery", battery, time.time())
                 else:
-                    logging.warning("%s onZwaveMessage. Unrecognised message: %s", ModuleName, str(message))
+                    cbLog("warning", "onZwaveMessage. Unrecognised message: " + str(message))
                 self.updateTime = message["data"]["updateTime"]
             except Exception as ex:
-                logging.warning("%s onZwaveMessage. Exception: %s %s %s", ModuleName, str(message), type(ex), str(ex.args))
+                cbLog("warning", "onZwaveMessage. Exception: " + str(message) + " " + str(type(ex)) + " " + str(ex.args))
 
     def onAppInit(self, message):
-        logging.debug("%s %s %s onAppInit, req = %s", ModuleName, self.id, self.friendly_name, message)
+        cbLog("debug", "onAppInit, req: " +  str(message))
         resp = {"name": self.name,
                 "id": self.id,
                 "status": "ok",
@@ -158,7 +154,6 @@ class Adaptor(CbAdaptor):
         self.setState("running")
 
     def onAppRequest(self, message):
-        #logging.debug("%s %s %s onAppRequest, message = %s", ModuleName, self.id, self.friendly_name, message)
         # Switch off anything that already exists for this app
         for a in self.apps:
             if message["id"] in self.apps[a]:
@@ -167,21 +162,19 @@ class Adaptor(CbAdaptor):
         for f in message["service"]:
             if message["id"] not in self.apps[f["characteristic"]]:
                 self.apps[f["characteristic"]].append(message["id"])
-        logging.debug("%s %s %s apps: %s", ModuleName, self.id, self.friendly_name, str(self.apps))
+        cbLog("debug", "apps: " + str(self.apps))
 
     def onAppCommand(self, message):
-        #logging.debug("%s %s %s onAppCommand, req = %s", ModuleName, self.id, self.friendly_name, message)
         if "data" not in message:
-            logging.warning("%s %s %s app message without data: %s", ModuleName, self.id, self.friendly_name, message)
+            cbLog("warning", "app message without data: " + str(message))
         else:
-            logging.warning("%s %s %s This is a sensor. Message not understood: %s", ModuleName, self.id, self.friendly_name, message)
-
+            cbLog("warning", "This is a sensor. Message not understood: " + str(message)
+)
     def onConfigureMessage(self, config):
         """Config is based on what apps are to be connected.
             May be called again if there is a new configuration, which
             could be because a new app has been added.
         """
-        #logging.debug("%s onConfigureMessage, config: %s", ModuleName, config)
         self.setState("starting")
 
 if __name__ == '__main__':
