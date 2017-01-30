@@ -2,10 +2,10 @@
     "exe": "adaptor.py", 
     "protocol": "zwave", 
     "name": "Z-Wave.Me 1 256", 
-    "device_resource": "/api/bridge/v1/device/50/", 
-    "url": "https://github.com/ContinuumBridge/zwave.me_key_ring/archive/v1.1.2.tar.gz", 
-    "version": "1.1.2", 
+    "device_resource": "/api/bridge/v1/device/50", 
+    "url": "https://github.com/ContinuumBridge/zwave.me_key_ring/archive/v1.2.0.tar.gz", 
+    "version": "1.2.0", 
     "provider": "ContinuumBridge", 
-    "adaptor_resource": "/api/bridge/v1/adaptor/13/", 
+    "adaptor_resource": "/api/bridge/v1/adaptor/13", 
     "description": "Z-Wave.Me Key Ring Controller with four buttons."
 }

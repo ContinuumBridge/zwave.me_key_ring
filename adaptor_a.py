@@ -29,6 +29,8 @@ class Adaptor(CbAdaptor):
                                  "battery": [],
                                  "connected": []}
         self.currentValue =     "0"
+        self.lastUpdateTime = 0
+        self.lastIdTime = 0
         # super's __init__ must be called:
         #super(Adaptor, self).__init__(argv)
         CbAdaptor.__init__(self, argv)
@@ -108,6 +110,11 @@ class Adaptor(CbAdaptor):
             reactor.callLater(60, self.checkBattery)
         elif message["content"] == "data":
             try:
+                if message["data"]["updateTime"] == self.lastIdTime and message["commandClass"] == "32" and \
+                    message["value"] == "srcNodeId":
+                    return
+                elif message["value"] == "srcNodeId":
+                    self.lastIdTime = message["data"]["updateTime"]
                 if message["commandClass"] == "32":
                     if message["value"] == "level":
                         self.currentValue = message["data"]["value"]
